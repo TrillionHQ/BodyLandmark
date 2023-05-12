@@ -175,11 +175,12 @@ else:
 
     from scipy.ndimage import label
 
-    temp = np.array([])
     # loop through pictures
     for t in range(number_of_picture):
         points = {}  # dictionary body parts' coordinate
-        plt.figure(figsize=(15, 7), dpi=150)
+        fig = plt.figure(figsize=(12, 6), dpi=150)
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122, projection='3d')
         for i in range(14):
             # get heatmap
             heatmap = y[t, :, :, i]
@@ -200,22 +201,16 @@ else:
             coords = [round(i) for i in face_location[max(face_location.keys())]]
             coords.append(heatmap[coords[0], coords[1]])
             points[title_set[i]] = coords
-            if i == 0:
-                np_coords = np.array([coords], ndmin=2)
-            else:
-                np_coords = np.append(np_coords, np.array([coords], ndmin=2), axis=0)
 
-            # plot images
-            plt.subplot(3, 6, i + 1)
-            plt.imshow(heatmap)
-            plt.title(title_set[i])
+            ax2.scatter(coords[2], coords[0], coords[1], color='b')
+            ax2.text(coords[2], coords[0], coords[1], '%s' % (title_set[i]), size=7, zorder=1, color='k')
 
-        plt.subplot(3, 6, 15)
-        plt.imshow(data[vis_img_id + t].astype(np.uint8))
-        plt.subplot(3, 6, 16, projection="3d")
-        plt.scatter(
-            np_coords[:, 2], np_coords[:, 0], np_coords[:, 1], marker="o", c="red"
-        )
+        ax2.set_xlabel('z')
+        ax2.set_ylabel('x')
+        ax2.set_zlabel('y')
+
+        ax1.imshow(data[vis_img_id + t].astype(np.uint8))
+        # plt.subplot(1, 2, 2, projection="3d")
         # plt.savefig("demo.png")
         plt.show()
 pass
